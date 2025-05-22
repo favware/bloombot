@@ -1,10 +1,11 @@
 import { CustomIdPrefixes } from '#lib/util/constants';
 import { BloombotEmojis } from '#lib/util/emojis';
+import { formatJobUpdateMessage } from '#lib/util/functions/formatJobUpdateMessage';
 import { handleJobOrRoleButtonClick } from '#lib/util/functions/handleJobOrRoleButtonClick';
 import { $Enums } from '@prisma/client';
 import { ApplyOptions } from '@sapphire/decorators';
 import { InteractionHandler, InteractionHandlerTypes } from '@sapphire/framework';
-import { inlineCode, type ButtonInteraction } from 'discord.js';
+import { type ButtonInteraction } from 'discord.js';
 
 @ApplyOptions<InteractionHandler.Options>({
 	interactionHandlerType: InteractionHandlerTypes.Button
@@ -12,7 +13,7 @@ import { inlineCode, type ButtonInteraction } from 'discord.js';
 export class ButtonHandler extends InteractionHandler {
 	public override async run(interaction: ButtonInteraction<'cached'>) {
 		return interaction.editReply({
-			content: `${BloombotEmojis.GreenTick} Successfully updated your job to ${inlineCode($Enums.Jobs.Monk)}.`
+			content: formatJobUpdateMessage(BloombotEmojis.Monk, $Enums.Jobs.Monk)
 		});
 	}
 

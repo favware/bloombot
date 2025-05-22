@@ -16,8 +16,16 @@ enum EventInterval {
     @@map("event_interval")
 }
 
+enum EventVariant {
+    NORMAL          @map("normal")
+    OCCULT_CRESCENT @map("occult_crescent")
+
+    @@map("event_variant")
+}
+
 enum Roles {
     AllRounder     @map("all_rounder")
+    PhantomJob     @map("phantom_job")
     Healer         @map("healer")
     MeleeDPS       @map("melee_dps")
     MagicRangedDPS @map("magic_ranged_dps")
@@ -32,29 +40,43 @@ enum Roles {
 }
 
 enum Jobs {
-    AllRounder  @map("all_rounder")
-    Paladin     @map("paladin")
-    Warrior     @map("warrior")
-    Dragoon     @map("dragoon")
-    Monk        @map("monk")
-    Bard        @map("bard")
-    BlackMage   @map("black_mage")
-    Summoner    @map("summoner")
-    Scholar     @map("scholar")
-    WhiteMage   @map("white_mage")
-    Ninja       @map("ninja")
-    DarkKnight  @map("dark_knight")
-    Machinist   @map("machinist")
-    Astrologian @map("astrologian")
-    Samurai     @map("samurai")
-    RedMage     @map("red_mage")
-    BlueMage    @map("blue_mage")
-    Gunbreaker  @map("gunbreaker")
-    Dancer      @map("dancer")
-    Reaper      @map("reaper")
-    Sage        @map("sage")
-    Viper       @map("viper")
-    Pictomancer @map("pictomancer")
+    AllRounder        @map("all_rounder")
+    Paladin           @map("paladin")
+    Warrior           @map("warrior")
+    Dragoon           @map("dragoon")
+    Monk              @map("monk")
+    Bard              @map("bard")
+    BlackMage         @map("black_mage")
+    Summoner          @map("summoner")
+    Scholar           @map("scholar")
+    WhiteMage         @map("white_mage")
+    Ninja             @map("ninja")
+    DarkKnight        @map("dark_knight")
+    Machinist         @map("machinist")
+    Astrologian       @map("astrologian")
+    Samurai           @map("samurai")
+    RedMage           @map("red_mage")
+    BlueMage          @map("blue_mage")
+    Gunbreaker        @map("gunbreaker")
+    Dancer            @map("dancer")
+    Reaper            @map("reaper")
+    Sage              @map("sage")
+    Viper             @map("viper")
+    Pictomancer       @map("pictomancer")
+    // Beastmaster       @map("beastmaster") TODO: To be added in later patch content
+    PhantomBard       @map("phantom_bard")
+    PhantomBerserker  @map("phantom_berserker")
+    PhantomCannoneer  @map("phantom_cannoneer")
+    PhantomChemist    @map("phantom_chemist")
+    PhantomFreelancer @map("phantom_freelancer")
+    PhantomGeomancer  @map("phantom_geomancer")
+    PhantomKnight     @map("phantom_knight")
+    PhantomMonk       @map("phantom_monk")
+    PhantomOracle     @map("phantom_oracle")
+    PhantomRanger     @map("phantom_ranger")
+    PhantomSamurai    @map("phantom_samurai")
+    PhantomThief      @map("phantom_thief")
+    PhantomTimeMage   @map("phantom_timemage")
 
     @@map("jobs")
 }
@@ -78,19 +100,20 @@ model VerifiedServers {
 }
 
 model Event {
-    id             String         @id @default(cuid())
-    name           String
-    bannerImage    String?        @map("banner_image")
-    channelId      String         @map("channel_id")
-    description    String?
-    duration       Int
-    guildId        String         @map("guild_id")
-    interval       EventInterval?
-    leader         String
-    roleToPing     String?        @map("role_to_ping")
-    createdAt      DateTime       @default(now()) @map("created_at")
-    updatedAt      DateTime       @updatedAt @map("updated_at")
-    instance       EventInstance?
+    id          String         @id @default(cuid())
+    name        String
+    bannerImage String?        @map("banner_image")
+    channelId   String         @map("channel_id")
+    description String?
+    duration    Int
+    guildId     String         @map("guild_id")
+    interval    EventInterval?
+    leader      String
+    roleToPing  String?        @map("role_to_ping")
+    createdAt   DateTime       @default(now()) @map("created_at")
+    updatedAt   DateTime       @updatedAt @map("updated_at")
+    instance    EventInstance?
+    variant     EventVariant   @default(NORMAL) @map("event_variant")
 
     @@map("events")
 }

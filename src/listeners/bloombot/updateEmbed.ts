@@ -3,7 +3,9 @@ import { BloombotEmojis } from '#lib/util/emojis';
 import { buildEventAttachment } from '#lib/util/functions/buildEventAttachment';
 import { buildEventComponents } from '#lib/util/functions/buildEventComponents';
 import { buildEventEmbed } from '#lib/util/functions/buildEventEmbed';
+import { buildPhantomJobComponent } from '#lib/util/functions/buildPhantomJobComponent';
 import { OwnerMentions } from '#root/config';
+import { $Enums } from '@prisma/client';
 import { Listener, UserError } from '@sapphire/framework';
 import { roleMention } from 'discord.js';
 
@@ -37,19 +39,23 @@ export class UserListener extends Listener<typeof BloombotEvents.UpdateEmbed> {
 							embeds: [
 								buildEventEmbed(
 									{
-										id: eventData.id,
-										name: eventData.name,
 										bannerImage: eventData.bannerImage,
 										channelId: eventData.channelId,
 										description: eventData.description,
+										id: eventData.id,
+										instance: { dateTime: eventData.instance.dateTime, participants: eventData.instance.participants },
 										leader: eventData.leader,
+										name: eventData.name,
 										roleToPing: eventData.roleToPing,
-										instance: { dateTime: eventData.instance.dateTime, participants: eventData.instance.participants }
+										variant: eventData.variant
 									} as EventData,
 									shouldDisableEvent
 								)
 							],
-							components: buildEventComponents(eventData.id, shouldDisableEvent),
+							components:
+								eventData.variant === $Enums.EventVariant.NORMAL
+									? buildEventComponents(eventData.id, shouldDisableEvent)
+									: buildPhantomJobComponent(eventData.id, shouldDisableEvent),
 							files: buildEventAttachment(eventData as EventData),
 							allowedMentions: { roles: eventData.roleToPing ? [eventData.roleToPing] : undefined }
 						});

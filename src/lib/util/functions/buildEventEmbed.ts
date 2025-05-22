@@ -8,12 +8,14 @@ import {
 	getLateParticipants,
 	getMagicRangedDpsParticipants,
 	getMeleeDpsParticipants,
+	getPhantomJobParticipants,
 	getPhysRangedDpsParticipants,
 	getPresentParticipants,
 	getTankParticipants,
 	getTentativeParticipants,
 	type FilteredParticipant
 } from '#lib/util/functions/participantRoleFilters';
+import { $Enums } from '@prisma/client';
 import { bold, EmbedBuilder, inlineCode, time, TimestampStyles, underline, userMention } from 'discord.js';
 
 export function buildEventEmbed(event: EventData, shouldDisableEvent = false) {
@@ -30,6 +32,7 @@ export function buildEventEmbed(event: EventData, shouldDisableEvent = false) {
 	const physRangedDpsParticipants = getPhysRangedDpsParticipants(event);
 	const tankParticipants = getTankParticipants(event);
 	const healerParticipants = getHealerParticipants(event);
+	const phantomJobParticipants = getPhantomJobParticipants(event);
 	const allRounderParticipants = getAllRounderParticipants(event);
 
 	builder.setTitle(event.name).setColor(shouldDisableEvent ? BrandingColors.ExpiredEvent : BrandingColors.Primary);
@@ -66,23 +69,28 @@ export function buildEventEmbed(event: EventData, shouldDisableEvent = false) {
 				braillePatternBlank,
 				`${shouldDisableEvent ? BloombotEmojis.CountdownExpired : BloombotEmojis.Countdown} ${time(eventDateTime, TimestampStyles.RelativeTime)}`
 			].join('\n')
-		},
-		{
-			inline: true,
-			name: leftToRightMark,
-			value: `${BloombotEmojis.Tank} Tanks ${bold(tankParticipants.length.toString())}`
-		},
-		{
-			inline: true,
-			name: leftToRightMark,
-			value: `${BloombotEmojis.DPS} DPS ${bold((meleeDpsParticipants.length + physRangedDpsParticipants.length + magicRangedDpsParticipants.length).toString())}`
-		},
-		{
-			inline: true,
-			name: leftToRightMark,
-			value: `${BloombotEmojis.Healer} Healers ${bold(healerParticipants.length.toString())}`
 		}
 	);
+
+	if (event.variant === $Enums.EventVariant.NORMAL) {
+		builder.addFields(
+			{
+				inline: true,
+				name: leftToRightMark,
+				value: `${BloombotEmojis.Tank} Tanks ${bold(tankParticipants.length.toString())}`
+			},
+			{
+				inline: true,
+				name: leftToRightMark,
+				value: `${BloombotEmojis.DPS} DPS ${bold((meleeDpsParticipants.length + physRangedDpsParticipants.length + magicRangedDpsParticipants.length).toString())}`
+			},
+			{
+				inline: true,
+				name: leftToRightMark,
+				value: `${BloombotEmojis.Healer} Healers ${bold(healerParticipants.length.toString())}`
+			}
+		);
+	}
 
 	if (tankParticipants.length > 0) {
 		const tankLines = tankParticipants.map(filteredParticipantsNewLines);
@@ -164,6 +172,20 @@ export function buildEventEmbed(event: EventData, shouldDisableEvent = false) {
 			value: [
 				`${BloombotEmojis.AllRounder} ${bold(underline('Allrounder'))} ${allRounderCount}`, //
 				...allRounderLines
+			].join('\n')
+		});
+	}
+
+	if (phantomJobParticipants.length > 0) {
+		const phantomJobLines = phantomJobParticipants.map(filteredParticipantsNewLines);
+		const phantomJobCount = bold(`(${phantomJobLines.length.toString()})`);
+
+		builder.addFields({
+			inline: true,
+			name: leftToRightMark,
+			value: [
+				`${BloombotEmojis.PhantomJob} ${bold(underline('Phantom Jobs'))} ${phantomJobCount}`, //
+				...phantomJobLines
 			].join('\n')
 		});
 	}

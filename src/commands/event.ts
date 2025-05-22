@@ -4,6 +4,7 @@ import { BloombotEmojis } from '#lib/util/emojis';
 import { buildEventAttachment } from '#lib/util/functions/buildEventAttachment';
 import { buildEventComponents } from '#lib/util/functions/buildEventComponents';
 import { buildEventEmbed } from '#lib/util/functions/buildEventEmbed';
+import { buildPhantomJobComponent } from '#lib/util/functions/buildPhantomJobComponent';
 import { resolveOnErrorCodes } from '#lib/util/functions/resolveOnErrorCodes';
 import { OwnerMentions, Owners } from '#root/config';
 import { $Enums } from '@prisma/client';
@@ -115,6 +116,16 @@ export class SlashCommand extends BloomCommand {
 								.setDescription('The banner image, shown below the event embed and in the Discord server event banner.')
 								.setRequired(false)
 						)
+						.addStringOption((builder) =>
+							builder //
+								.setName('variant')
+								.setDescription('The event variant for this event')
+								.setRequired(false)
+								.setChoices(
+									{ name: 'Normal', value: $Enums.EventVariant.NORMAL },
+									{ name: 'Occult Crescent', value: $Enums.EventVariant.OCCULT_CRESCENT }
+								)
+						)
 				)
 				.addSubcommand((builder) =>
 					builder //
@@ -207,6 +218,16 @@ export class SlashCommand extends BloomCommand {
 								.setDescription('The banner image, shown below the event embed and in the Discord server event banner.')
 								.setRequired(false)
 						)
+						.addStringOption((builder) =>
+							builder //
+								.setName('variant')
+								.setDescription('The new event variant for this event')
+								.setRequired(false)
+								.setChoices(
+									{ name: 'Normal', value: $Enums.EventVariant.NORMAL },
+									{ name: 'Occult Crescent', value: $Enums.EventVariant.OCCULT_CRESCENT }
+								)
+						)
 				)
 				.addSubcommand((builder) =>
 					builder //
@@ -286,6 +307,8 @@ export class SlashCommand extends BloomCommand {
 		const roleToPing = interaction.options.getRole('role-to-ping', false);
 		const eventDuration = interaction.options.getInteger('duration', true);
 		const leader = interaction.options.getUser('leader', false);
+		const variant = interaction.options.getString('variant', false);
+
 		const event = await this.container.prisma.event.create({
 			data: {
 				name,
@@ -297,6 +320,7 @@ export class SlashCommand extends BloomCommand {
 				roleToPing: roleToPing?.id,
 				leader: leader?.id ?? interaction.user.id,
 				bannerImage: await this.getBannerImage(interaction),
+				variant: (variant as $Enums.EventVariant | null) ?? $Enums.EventVariant.NORMAL,
 				instance: {
 					create: {
 						dateTime: eventDate
@@ -360,7 +384,8 @@ export class SlashCommand extends BloomCommand {
 					select: {
 						name: true,
 						description: true,
-						roleToPing: true
+						roleToPing: true,
+						variant: true
 					}
 				}
 			},
@@ -378,10 +403,15 @@ export class SlashCommand extends BloomCommand {
 		const eventIdHeader = heading('Event ID', 2);
 		const eventListHeader = heading('Event List', 1);
 
+		const variantMapping = {
+			[$Enums.EventVariant.NORMAL]: `${BloombotEmojis.Nightbloom} Normal`,
+			[$Enums.EventVariant.OCCULT_CRESCENT]: `${BloombotEmojis.PhantomJob} Occult Crescent`
+		};
+
 		const eventList = eventInstances
 			.map((eventInstance) => {
 				const { id, dateTime, event } = eventInstance;
-				const { name, description, roleToPing } = event;
+				const { name, description, roleToPing, variant } = event;
 
 				return [
 					`${eventIdHeader}: ${id}`,
@@ -391,7 +421,8 @@ export class SlashCommand extends BloomCommand {
 							`**Description:** ${description}`,
 							`**Date:** ${time(dateTime, TimestampStyles.ShortDate)}`,
 							`**Time:** ${time(dateTime, TimestampStyles.ShortTime)}`,
-							roleToPing ? `**Role to ping:** ${roleMention(roleToPing)}` : undefined
+							roleToPing ? `**Role to ping:** ${roleMention(roleToPing)}` : undefined,
+							`**Variant:** ${variantMapping[variant]}`
 						].filter(filterNullish)
 					)
 				].join('\n');
@@ -432,6 +463,7 @@ export class SlashCommand extends BloomCommand {
 				interval: true,
 				leader: true,
 				roleToPing: true,
+				variant: true,
 				instance: {
 					select: {
 						dateTime: true,
@@ -485,6 +517,7 @@ export class SlashCommand extends BloomCommand {
 		const eventDuration = interaction.options.getInteger('duration', false);
 		const roleToPing = interaction.options.getRole('role-to-ping', false);
 		const leader = interaction.options.getUser('leader', false);
+		const variant = interaction.options.getString('variant', false);
 
 		const resolvedEventChannel =
 			channel ?? (existingEvent.channelId ? interaction.guild.channels.cache.get(existingEvent.channelId) : null) ?? interaction.channel;
@@ -509,6 +542,7 @@ export class SlashCommand extends BloomCommand {
 				leader: leader?.id ?? existingEvent.leader,
 				bannerImage: (await this.getBannerImage(interaction)) ?? existingEvent.bannerImage,
 				duration: eventDuration ?? existingEvent.duration,
+				variant: (variant as $Enums.EventVariant | null) ?? existingEvent.variant,
 				instance: {
 					update: {
 						dateTime: eventDate,
@@ -521,12 +555,13 @@ export class SlashCommand extends BloomCommand {
 				name: true,
 				bannerImage: true,
 				channelId: true,
+				createdAt: true,
 				description: true,
 				interval: true,
 				leader: true,
 				roleToPing: true,
-				createdAt: true,
 				updatedAt: true,
+				variant: true,
 				instance: {
 					include: {
 						participants: true
@@ -556,7 +591,10 @@ export class SlashCommand extends BloomCommand {
 				const postedMessage = await resolvedEventChannel.send({
 					content: updatedEvent.roleToPing ? roleMention(updatedEvent.roleToPing) : undefined,
 					embeds: [buildEventEmbed(updatedEvent as EventData)],
-					components: buildEventComponents(updatedEvent.id),
+					components:
+						updatedEvent.variant === $Enums.EventVariant.NORMAL
+							? buildEventComponents(updatedEvent.id)
+							: buildPhantomJobComponent(updatedEvent.id),
 					files: buildEventAttachment(updatedEvent as EventData),
 					allowedMentions: { roles: updatedEvent.roleToPing ? [updatedEvent.roleToPing] : undefined }
 				});

@@ -27,6 +27,21 @@ export const BloombotEmojis: Record<Emojis, string> = {
 	Warrior: formatEmoji('1324558658922745887', false),
 	WhiteMage: formatEmoji('1324558660285759538', false),
 
+	// Phantom Jobs
+	PhantomBard: formatEmoji('1375034095393832991', false),
+	PhantomBerserker: formatEmoji('1375034090343895051', false),
+	PhantomCannoneer: formatEmoji('1375034085679829043', false),
+	PhantomChemist: formatEmoji('1375034096794996737', false),
+	PhantomFreelancer: formatEmoji('1375034084694294549', false),
+	PhantomGeomancer: formatEmoji('1375034083427483710', false),
+	PhantomKnight: formatEmoji('1375034086464290920', false),
+	PhantomMonk: formatEmoji('1375034092160286801', false),
+	PhantomOracle: formatEmoji('1375034087785500683', false),
+	PhantomRanger: formatEmoji('1375034089186525247', false),
+	PhantomSamurai: formatEmoji('1375034082249019492', false),
+	PhantomThief: formatEmoji('1375034080416104519', false),
+	PhantomTimeMage: formatEmoji('1375034093753864262', false),
+
 	// Job Types
 	AllRounder: formatEmoji('1324558617193746502', false),
 	DPS: formatEmoji('1324558629202038826', false),
@@ -35,6 +50,7 @@ export const BloombotEmojis: Record<Emojis, string> = {
 	MagicRangedDPS: formatEmoji('1324558639893315625', false),
 	PhysRangedDPS: formatEmoji('1324558644448067694', false),
 	Tank: formatEmoji('1324558655202398279', false),
+	PhantomJob: '🌙',
 
 	// Event Data
 	Absence: formatEmoji('1324558615939649559', false),
@@ -54,7 +70,8 @@ export const BloombotEmojis: Record<Emojis, string> = {
 
 	// Other
 	RedCross: formatEmoji('1324572748130947143', false),
-	GreenTick: formatEmoji('1324572747069915188', false)
+	GreenTick: formatEmoji('1324572747069915188', false),
+	Nightbloom: formatEmoji('1276857491262672980', false)
 } as const;
 
 export function getEmojiForJob(job: $Enums.Jobs): string {

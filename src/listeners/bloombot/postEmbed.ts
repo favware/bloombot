@@ -2,6 +2,8 @@ import type { BloombotEvents, EventData, PostEmbedPayload } from '#lib/util/cons
 import { buildEventAttachment } from '#lib/util/functions/buildEventAttachment';
 import { buildEventComponents } from '#lib/util/functions/buildEventComponents';
 import { buildEventEmbed } from '#lib/util/functions/buildEventEmbed';
+import { buildPhantomJobComponent } from '#lib/util/functions/buildPhantomJobComponent';
+import { $Enums } from '@prisma/client';
 import { Listener } from '@sapphire/framework';
 import { roleMention } from 'discord.js';
 
@@ -29,7 +31,7 @@ export class UserListener extends Listener<typeof BloombotEvents.PostEmbed> {
 				const postedMessage = await eventChannel.send({
 					content: eventData.roleToPing ? roleMention(eventData.roleToPing) : undefined,
 					embeds: [buildEventEmbed(eventData as EventData)],
-					components: buildEventComponents(eventId),
+					components: eventData.variant === $Enums.EventVariant.NORMAL ? buildEventComponents(eventId) : buildPhantomJobComponent(eventId),
 					files: buildEventAttachment(eventData as EventData),
 					allowedMentions: { roles: eventData.roleToPing ? [eventData.roleToPing] : undefined }
 				});

@@ -44,6 +44,10 @@ export function getHealerParticipants(event: EventData): FilteredParticipant[] {
 	return event.instance.participants.filter((participant) => participant.role === 'Healer');
 }
 
+export function getPhantomJobParticipants(event: EventData): FilteredParticipant[] {
+	return event.instance.participants.filter((participant) => participant.role === 'PhantomJob');
+}
+
 export function getAllRounderParticipants(event: EventData): FilteredParticipant[] {
 	return event.instance.participants.filter((participant) => participant.role === 'AllRounder');
 }

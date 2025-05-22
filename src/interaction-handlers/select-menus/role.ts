@@ -45,6 +45,7 @@ export class StringSelectMenuHandler extends InteractionHandler {
 			case $Enums.Roles.Tentative:
 			case $Enums.Roles.Absence:
 			case $Enums.Roles.Bench:
+			case $Enums.Roles.PhantomJob:
 				throw new UserError({
 					message: `${BloombotEmojis.RedCross} I received an unexpected role from the select menu of selecting your role. Contact ${OwnerMentions} for assistance.`,
 					identifier: ErrorIdentifiers.UnexpectedRoleSelectMenuChoiceError
@@ -59,12 +60,12 @@ export class StringSelectMenuHandler extends InteractionHandler {
 			});
 
 			return interaction.editReply({
-				content: `${BloombotEmojis.GreenTick} Successfully updated your role to ${inlineCode(result.selectedRole)}.`
+				content: `${BloombotEmojis.GreenTick} Successfully updated your role to ${BloombotEmojis[result.selectedRole]} ${inlineCode(result.selectedRole)}.`
 			});
 		}
 
 		return interaction.editReply({
-			content: `${BloombotEmojis.GreenTick} Successfully updated your role to ${inlineCode(result.selectedRole)}. Next, select which job you will be playing from these options:`,
+			content: `${BloombotEmojis.GreenTick} Successfully updated your role to ${BloombotEmojis[result.selectedRole]} ${inlineCode(result.selectedRole)}. Next, select which job you will be playing from these options:`,
 			components
 		});
 	}

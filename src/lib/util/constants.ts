@@ -75,7 +75,9 @@ export const enum CustomIdPrefixes {
 	DarkKnight = 'darkknight',
 	Gunbreaker = 'gunbreaker',
 	Paladin = 'paladin',
-	Warrior = 'warrior'
+	Warrior = 'warrior',
+
+	PhantomJobSelectMenu = 'phantom-job-select-menu'
 }
 /* eslint-enable typescript-sort-keys/string-enum */
 
@@ -108,13 +110,13 @@ export const enum UpdateEmbedPayloadOrigin {
 	RoleSelectMenu = 'role-select-menu'
 }
 
-export type EventData = Pick<Event, 'bannerImage' | 'channelId' | 'description' | 'id' | 'leader' | 'name' | 'roleToPing'> & {
+export type EventData = Pick<Event, 'bannerImage' | 'channelId' | 'description' | 'id' | 'leader' | 'name' | 'roleToPing' | 'variant'> & {
 	instance: Pick<EventInstance, 'dateTime'> & {
 		participants: Pick<Participant, 'discordId' | 'job' | 'role' | 'signupOrder'>[];
 	};
 };
 
-type JobTypeEmojis = 'AllRounder' | 'DPS' | 'Healer' | 'MagicRangedDPS' | 'MeleeDPS' | 'PhysRangedDPS' | 'Tank';
+type JobTypeEmojis = 'AllRounder' | 'DPS' | 'Healer' | 'MagicRangedDPS' | 'MeleeDPS' | 'PhantomJob' | 'PhysRangedDPS' | 'Tank';
 type EventDataEmojis =
 	| 'Absence'
 	| 'Bench'
@@ -130,6 +132,6 @@ type EventDataEmojis =
 	| 'Tentative'
 	| 'Time'
 	| 'TimeExpired';
-type OtherEmojis = 'GreenTick' | 'RedCross';
+type OtherEmojis = 'GreenTick' | 'Nightbloom' | 'RedCross';
 
 export type Emojis = EventDataEmojis | Jobs | JobTypeEmojis | OtherEmojis;
